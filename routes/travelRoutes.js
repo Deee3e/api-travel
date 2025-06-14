@@ -1,74 +1,29 @@
-const { OAuth2Client } = require('google-auth-library');
-const User = require('../models/User');
+const express = require('express');
+const router = express.Router(); // Baris ini yang mungkin hilang
 
-// Inisialisasi Google Auth Client dengan Client ID server Anda
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// Impor controller dan middleware yang diperlukan
+const { getAllTravels, getMyTravels, createTravel, deleteTravel } = require('../controllers/travelController');
+const { ensureAuth } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
-// Memverifikasi token dari klien (Android)
-exports.verifyToken = async (req, res) => {
-    const { token } = req.body;
-    if (!token) {
-        return res.status(400).json({ message: 'ID Token tidak ditemukan.' });
-    }
+// Rute publik untuk melihat semua cerita
+// Endpoint: GET /api/travels/
+router.get('/', getAllTravels);
 
-    try {
-        // Verifikasi token menggunakan library Google
-        const ticket = await client.verifyIdToken({
-            idToken: token,
-            audience: process.env.GOOGLE_CLIENT_ID,
-        });
-        const payload = ticket.getPayload();
-        const googleId = payload['sub'];
+// --- Rute yang membutuhkan login ---
 
-        // Mencari user di database, atau membuat user baru jika tidak ada
-        let user = await User.findOne({ where: { googleId: googleId } });
-        if (!user) {
-            user = await User.create({
-                googleId: googleId,
-                displayName: payload['name'],
-                email: payload['email'],
-                image: payload['picture'],
-            });
-        }
-        
-        // Membuat sesi login untuk pengguna menggunakan Passport
-        req.login(user, (err) => {
-            if (err) {
-                return res.status(500).json({ message: 'Gagal membuat sesi.' });
-            }
-            // Kirim data user sebagai konfirmasi login berhasil
-            return res.status(200).json(user);
-        });
+// Mendapatkan cerita perjalanan milik pengguna yang sedang login
+// Endpoint: GET /api/travels/mine
+router.get('/mine', ensureAuth, getMyTravels);
 
-    } catch (error) {
-        console.error("Error verifikasi token:", error);
-        return res.status(401).json({ message: 'Login gagal: Token tidak valid atau kedaluwarsa.' });
-    }
-};
+// Membuat cerita perjalanan baru
+// Endpoint: POST /api/travels/
+router.post('/', ensureAuth, upload.single('image'), createTravel);
 
-// Logout pengguna
-exports.logout = (req, res, next) => {
-    req.logout(err => {
-        if (err) {
-            return res.status(500).json({ message: 'Gagal logout.' });
-        }
-        req.session.destroy(err => {
-            if (err) {
-                return res.status(500).json({ message: 'Gagal menghapus sesi.' });
-            }
-            res.clearCookie('connect.sid'); // Hapus cookie sesi dari browser/klien
-            return res.status(200).json({ message: 'Logout berhasil' });
-        });
-    });
-};
+// Menghapus cerita perjalanan
+// Endpoint: DELETE /api/travels/:id
+router.delete('/:id', ensureAuth, deleteTravel);
 
-// Mendapatkan data user yang sedang login
-exports.getCurrentUser = (req, res) => {
-    if (req.user) {
-        res.status(200).json(req.user);
-    } else {
-        res.status(401).json({ message: 'Tidak terautentikasi' });
-    }
-};
 
+// Baris ini mengekspor router agar bisa digunakan di server.js
 module.exports = router;
