@@ -3,7 +3,7 @@ const router = express.Router(); // Baris ini yang mungkin hilang
 
 // Impor controller dan middleware yang diperlukan
 const { getAllTravels, getMyTravels, createTravel, deleteTravel } = require('../controllers/travelController');
-const { ensureAuth } = require('../middleware/authMiddleware');
+const { ensureAuth } = require('../middleware/authMiddleware.js');
 const upload = require('../middleware/uploadMiddleware');
 
 // Rute publik untuk melihat semua cerita
