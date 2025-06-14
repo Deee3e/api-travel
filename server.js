@@ -8,6 +8,7 @@ const fs = require('fs');
 const sequelize = require('./config/database');
 const authRoutes = require('./routes/authRoutes');
 const travelRoutes = require('./routes/travelRoutes'); // Menggunakan rute travel
+// File server utama untuk Travel API
 
 // Inisialisasi Passport (diperlukan untuk manajemen sesi)
 require('./config/passport');
