@@ -1,0 +1,32 @@
+{
+  "name": "travel-api",
+  "version": "1.0.0",
+  "description": "API for Travel Stories",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "db:migrate": "dotenv sequelize-cli db:migrate",
+    "db:seed": "dotenv sequelize-cli db:seed:all"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "google-auth-library": "^10.1.0",
+    "multer": "^2.0.1",
+    "mysql2": "^3.14.1",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "sequelize": "^6.37.7",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "dotenv-cli": "^7.4.2",
+    "sequelize-cli": "^6.6.2"
+  }
+}
