@@ -70,3 +70,5 @@ exports.getCurrentUser = (req, res) => {
         res.status(401).json({ message: 'Tidak terautentikasi' });
     }
 };
+
+module.exports = router;
